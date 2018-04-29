@@ -1,21 +1,3 @@
-//Funcao para identificar se os dados sao Qualitativos ou Quantitativos
-function identificarTipoVar(dados){
-    dados = dados.split(";");
-
-    if (isNaN(Number(dados[0]))) {
-        tipoVar = "QL";
-        dados = dados.sort();
-    } else {
-        tipoVar = "QT";
-        for (var i = 0; i < dados.length; i++) {
-            dados[i] = Number(dados[i]);
-        }
-    }
-
-    return dados;
-}
-
-
 //Funcao que ordena dados Quantitativos
 function ordenarQtt(dados){
     var desordenado = true;
@@ -123,7 +105,7 @@ function calcularVarContinua(){
 
     }
 
-    return [classes,varIni,varFim];
+    return [classes,varIni,varFim,fi];
 
 }
 
@@ -138,56 +120,99 @@ function sum(vet){
 
 //Funcao que calcula as variaveis e frequencias
 function calcularFreq(){
+    var mat = [];
 
-    var contfi = 0;
-    var cont = 0;
-
-    for (var i = 0; i < dados.length; i++) {
-        if (dados[i] == varPesq[cont]) {
-            contfi++;
-        }else {
-            fi.push(contfi);
-            varPesq.push(dados[i]);
-            contfi = 1;
-            cont++;
-
-        }
-
-        if (i == (dados.length-1)) {
-            fi.push(contfi);
-        }
-    }
-
-    //Caso a variavel seja continua
-    if(varPesq.length > 10){
-        tipoVar = "CNT";
+    if (tipoVar == "CNT") {
         varPesq = [];
         fi = [];
-        varPesq = calcularVarContinua();
-    }else {
-        tipoVar = "DSC";
+        mat = calcularVarContinua();
+    } else {
+        var contfi = 0;
+        var cont = 0;
+
+        for (var i = 0; i < dados.length; i++) {
+            if (dados[i] == varPesq[cont]) {
+                contfi++;
+            }else {
+                fi.push(contfi);
+                varPesq.push(dados[i]);
+                contfi = 1;
+                cont++;
+            }
+            if (i == (dados.length-1)) {
+                fi.push(contfi);
+            }
+        }
+        mat.push(varPesq);
+        mat.push(fi);
+
     }
 
     //Calcular frequencia relativa percentual, acumulada e acumulada percentual
     var somaFi = sum(fi);
     var num = 0;
+    var soma;
 
     fac.push(fi[0]);
 
     for (var i = 0; i < fi.length; i++) {
-        frP.push(Math.round((fi[i]/ somaFi)*100));
-        facP.push(frP[i] + num);
+        frP.push(parseFloat(((fi[i]/ somaFi)*100).toFixed(2)));
+        soma = frP[i] + num;
+        facP.push(parseFloat(soma.toFixed(2)));
         num = facP[i];
         if (i < fi.length -1) {
             fac.push(fac[i] + fi[i+1]);
         }
     }
-
-    return [varPesq,fi,frP,fac,facP];
+    mat.push(frP);
+    mat.push(fac);
+    mat.push(facP);
+    
+    return mat;
 }
 
 // Gerador de tabela
 
-function gerarTabela(){
-    
+function gerarTabela(matriz){
+    var tabela = document.createElement("table");
+    var cab = document.createElement("thead");
+    var trhead = document.createElement("tr");
+    var corpo = document.createElement("tbody");
+    var head;
+
+    if (tipoVar == "CNT") {
+        head = ["Classes",nomeVar,nomeFi,"fr%","Fac","Fac%"];
+    } else {
+        head = [nomeVar,nomeFi,"fr%","Fac","Fac%"];
+    }
+
+    for (var i = 0; i < head.length; i++) {
+
+        var th = document.createElement("th");
+
+        th.appendChild(document.createTextNode(head[i]));
+        trhead.appendChild(th);
+    }
+    cab.appendChild(trhead);
+    tabela.appendChild(cab);
+
+    for (var i = 0; i < matriz[0].length; i++) {
+        var tr = document.createElement("tr");
+
+        for (var j = 0; j < matriz.length; j++) {
+            var td = document.createElement("td");
+
+            if (tipoVar == "CNT" && j == 1) {
+                td.appendChild(document.createTextNode(matriz[j][i] +" |---- "+matriz[j+1][i]));
+            }else if(tipoVar == "CNT" && j == 2){
+                continue;
+            }else {
+                td.appendChild(document.createTextNode(matriz[j][i]));
+            }
+            tr.appendChild(td);
+        }
+        corpo.appendChild(tr);
+    }
+    tabela.appendChild(corpo);
+    document.getElementById('dTabela').appendChild(tabela);
 }
