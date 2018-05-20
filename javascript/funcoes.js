@@ -6,7 +6,6 @@ function ordenarQtt(a,b){
 //Funcao que ordena dados Qualitativos ordinais usando como referencia o vetor ordem
 function ordenarQltOrd(dados,ordem,posicao){
     var aux;
-    console.log(ordem);
 
     if (posicao < 0) {
         return dados;
@@ -199,12 +198,13 @@ function gerarTabela(matriz){
 }
 
 //Calcula Media, Moda, Mediana, Desvio padrao, coeficiente variacao e Separatrizes
-function calcularMedidasEst(matriz){
+function medidasEst(matriz){
     var media = 0;
     var mediana;
     var desvioPadrao = 0;
     var coeficienteVar;
     var num;
+    var medidas;
 
     //Caso seja Discreta
     if (tipoVar == "DSC") {
@@ -244,6 +244,7 @@ function calcularMedidasEst(matriz){
                 moda = null;
             }
         }
+        medidas = [media,mediana,moda];
 
     // Caso seja continua
     }else if (tipoVar == "CNT") {
@@ -348,7 +349,7 @@ function calcularMedidasEst(matriz){
             modaKing = "Amodal";
             modaCzuber = "Amodal";
         }
-
+        medidas = [media,mediana,modaConv,modaPearson,modaKing,modaCzuber];
     }
 
     //Diferencia caso seja populacao ou amostra
@@ -362,6 +363,9 @@ function calcularMedidasEst(matriz){
     desvioPadrao = parseFloat((desvioPadrao).toFixed(2));
     coeficienteVar = parseFloat(((desvioPadrao / media) * 100).toFixed(2));
 
+    medidas.push(desvioPadrao);
+    medidas.push(coeficienteVar);
+
     console.log("media "+media);
     console.log("mediana "+mediana);
     console.log("moda "+moda);
@@ -371,6 +375,8 @@ function calcularMedidasEst(matriz){
     console.log("moda Czuber "+modaCzuber);
     console.log("Desvio Padrao "+desvioPadrao);
     console.log("CV "+coeficienteVar);
+
+    return medidas;
 }
 
 //Gera o gráfico
@@ -445,4 +451,45 @@ function gerarGrafico(matriz){
         options: options
     });
 
+}
+
+//Calcula as Medidas Separatrizes
+function medSeparatrizes(matriz){
+    var pos;
+    var num;
+    var resposta;
+
+    if (tipoVar == "DSC") {
+        var somaFi = matriz[3][matriz.length-1];
+        pos = Math.round((somaFi * (valorSeparatriz/100)));
+
+        for (var i = 0; i < matriz[0].length; i++) {
+            if (matriz[3][i] >= pos && num == null) {
+                num = matriz[0][i];
+            }
+        }
+    }else if (tipoVar == "CNT") {
+        var somaFi = matriz[5][matriz.length-1];
+        var intervalo = matriz[2][0] - matriz[1][0];
+        var classe;
+        var facAnt;
+        pos = (somaFi * (valorSeparatriz/100));
+
+        for (var i = 0; i < matriz[0].length; i++) {
+            if (matriz[5][i] >= pos && classe == null) {
+                classe = i;
+            }
+        }
+
+        if (classe == 0) {
+            facAnt = 0;
+        }else {
+            facAnt = matriz[5][classe-1];
+        }
+
+        num = matriz[1][classe] + (((pos - facAnt)/matriz[3][classe]) * intervalo);
+        num = parseFloat((num).toFixed(2));
+    }
+    resposta = valorSeparatriz+"%: "+num+" ou - <br>"+(100 - valorSeparatriz)+"%: "+num+" ou +";
+    return resposta;
 }

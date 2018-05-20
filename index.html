@@ -14,7 +14,7 @@
         //var dados = "0;1;3;4;1;2;1;2;1;2;0;1;0;0;0;1;5;1;1;2;3;4";//soma de fi = 22
 
         //exercicio 9 pag 93
-        //var dados = "142;157;150;158;156;159;160;157;160;158;156;148;156;147;151;154;149;159;148;150;161;153;144;154;145;152;154;152;153;154;149;155;152;160;154;157;156;155;156;143;155;161;162;155;159;153;145;149;152;157";
+        var dados = "142;157;150;158;156;159;160;157;160;158;156;148;156;147;151;154;149;159;148;150;161;153;144;154;145;152;154;152;153;154;149;155;152;160;154;157;156;155;156;143;155;161;162;155;159;153;145;149;152;157";
 
         //ex  revisao 2
         //var dados = "5;8;10;7;10;14"
@@ -36,25 +36,28 @@
         //var dados = "4;4;5;6;7;7;8;9;5;4;4;7;7;7;9;9;9;9;4;7";
 
         //var dados;
-        var tipoVar;   //DSC ; CNT ; ORD; NML
-        var tipoPesq;      // AMS ; POP
+        var tipoVar = "CNT";   //DSC ; CNT ; ORD; NML
+        var tipoPesq = "POP";      // AMS ; POP
         var nomeVar;
         var nomeFi;
         var ordem;
         var tipoSeparatriz; // Q;K;D;P
         var valorSeparatriz;
+        var matriz;
 
         function main() {
             var form = document.getElementById("formulario");
-            var valido = validacao(form);
+            var valido = true//validacao(form);
 
             if (valido) {
-                dados = form.txtDados.value;
-                tipoVar = form.radioTipoVar.value;
-                tipoPesq = form.radioTipoPesq.value;
+                //dados = form.txtDados.value;
+                dados = dados.split(";")
+                //tipoVar = form.radioTipoVar.value;
+                //tipoPesq = form.radioTipoPesq.value;
                 nomeVar = form.txtNomeVar.value;
                 nomeFi = form.txtNomeFi.value;
-                ordem = form.txtOrdem.value;
+                //ordem = form.txtOrdem.value;
+                //ordem = ordem.split(";");
                 tipoSeparatriz = form.radioSepa.value;
                 valorSeparatriz = form.rangeSepa.value;
             } else {
@@ -82,10 +85,8 @@
         }
 
         function calcular(){
-            dados = dados.split(";");
 
             if (tipoVar == "ORD") {
-                ordem = ordem.split(";");
                 var posicao = ordem.length-1;
                 dados = ordenarQltOrd(dados,ordem,posicao);
             }else if (tipoVar == "NML") {
@@ -96,13 +97,14 @@
                 }
                 dados = dados.sort(ordenarQtt);
             }
-            var matriz = calcularFreq();
+            matriz = calcularFreq();
 
             // segunda página
             gerarTabela(matriz);
             gerarGrafico(matriz);
             if (tipoVar == "DSC" || tipoVar == "CNT") {
-                calcularMedidasEst(matriz);
+                var medEst = medidasEst(matriz);
+                var respSeparatrizes = medSeparatrizes(matriz);
             }
         }
 
@@ -115,33 +117,46 @@
         }
 
         function clickQuartil(){
-            var range = document.getElementById("myrange");
+            var range = document.getElementById("rangeSepa");
             range.step = 25;
             range.value = 0;
         }
 
         function clickQuintil(){
-            var range = document.getElementById("myrange");
+            var range = document.getElementById("rangeSepa");
             range.step = 20;
             range.value = 0;
         }
 
         function clickDecil(){
-            var range = document.getElementById("myrange");
+            var range = document.getElementById("rangeSepa");
             range.step = 10;
             range.value = 0;
         }
 
         function clickPorcentil(){
-            var range = document.getElementById("myrange");
+            var range = document.getElementById("rangeSepa");
             range.step = 1;
             range.value = 0;
         }
 
         function changeSlider(){
-            var range = document.getElementById("rangeSepa");
-            var label = document.getElementById("labelRange");
-            label.innerHTML = range.value;
+            var form = document.getElementById("formulario");
+            var range = form.rangeSepa;
+            var radio = form.radioSepa;
+            var label = document.getElementById('labelRange');
+            var j;
+
+            if (radio.value == "Q") {
+                j = 4;
+            }else if (radio.value == "K") {
+                j = 5;
+            }else if (radio.value == "D") {
+                j = 10;
+            }else if (radio.value == "P") {
+                j = 100;
+            }
+            label.innerHTML = radio.value + ((j * range.value)/100);
         }
     </script>
     <title>Página html</title>
