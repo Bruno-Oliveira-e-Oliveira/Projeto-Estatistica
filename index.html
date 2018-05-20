@@ -19,7 +19,7 @@
         //ex  revisao 2
         //var dados = "5;8;10;7;10;14"
 
-        var dados = "azul;vermelho;verde;azul;vermelho;azul;amarelo;roxo"
+        //var dados = "azul;vermelho;verde;azul;vermelho;azul;amarelo;roxo"
 
         //var dados = "bom;medio;bom;ruim;ruim;bom;bom;medio;ruim;medio";
 
@@ -35,19 +35,57 @@
         //revisao ex 1
         //var dados = "4;4;5;6;7;7;8;9;5;4;4;7;7;7;9;9;9;9;4;7";
 
-        var tipoVar = "NML";   //DSC ; CNT ; ORD; NML
-        var tipoPesq = "AMS";      // AMS ; POP
-        var nomeVar = "testevar";
-        var nomeFi = "testefi";
-        var ordem = ["bom","medio","ruim"];
-        var tipoSeparatriz = "Q"; // Q;K;D;P
+        //var dados;
+        var tipoVar;   //DSC ; CNT ; ORD; NML
+        var tipoPesq;      // AMS ; POP
+        var nomeVar;
+        var nomeFi;
+        var ordem;
+        var tipoSeparatriz; // Q;K;D;P
+        var valorSeparatriz;
 
+        function main() {
+            var form = document.getElementById("formulario");
+            var valido = validacao(form);
+
+            if (valido) {
+                dados = form.txtDados.value;
+                tipoVar = form.radioTipoVar.value;
+                tipoPesq = form.radioTipoPesq.value;
+                nomeVar = form.txtNomeVar.value;
+                nomeFi = form.txtNomeFi.value;
+                ordem = form.txtOrdem.value;
+                tipoSeparatriz = form.radioSepa.value;
+                valorSeparatriz = form.rangeSepa.value;
+            } else {
+                alert("Preencha todos os campos!");
+                return 0;
+            }
+            calcular();
+        }
+
+        function validacao(form) {
+            if (form.txtDados.value == "") {
+                return false;
+            } else if (form.txtNomeVar.value == "") {
+                return false;
+            } else if (form.txtNomeFi.value == "") {
+                return false;
+            } else if (form.radioTipoVar.value != "ORD") {
+                if (form.txtOrdem.value == "") {
+                    return false;
+                }
+            } else {
+                return true;
+            }
+
+        }
 
         function calcular(){
-
             dados = dados.split(";");
 
             if (tipoVar == "ORD") {
+                ordem = ordem.split(";");
                 var posicao = ordem.length-1;
                 dados = ordenarQltOrd(dados,ordem,posicao);
             }else if (tipoVar == "NML") {
@@ -56,9 +94,8 @@
                 for (var i = 0; i < dados.length; i++) {
                     dados[i] = Number(dados[i]);
                 }
-                dados = ordenarQtt(dados);
+                dados = dados.sort(ordenarQtt);
             }
-
             var matriz = calcularFreq();
 
             // segunda página
@@ -67,18 +104,101 @@
             if (tipoVar == "DSC" || tipoVar == "CNT") {
                 calcularMedidasEst(matriz);
             }
-
-
-
-
         }
 
+        function habilitarOrdem() {
+            document.getElementById("txtOrdem").disabled = false;
+        }
 
+        function desabilitarOrdem() {
+            document.getElementById("txtOrdem").disabled = true;
+        }
+
+        function clickQuartil(){
+            var range = document.getElementById("myrange");
+            range.step = 25;
+            range.value = 0;
+        }
+
+        function clickQuintil(){
+            var range = document.getElementById("myrange");
+            range.step = 20;
+            range.value = 0;
+        }
+
+        function clickDecil(){
+            var range = document.getElementById("myrange");
+            range.step = 10;
+            range.value = 0;
+        }
+
+        function clickPorcentil(){
+            var range = document.getElementById("myrange");
+            range.step = 1;
+            range.value = 0;
+        }
+
+        function changeSlider(){
+            var range = document.getElementById("rangeSepa");
+            var label = document.getElementById("labelRange");
+            label.innerHTML = range.value;
+        }
     </script>
     <title>Página html</title>
   </head>
   <body>
-        <input type="submit" name="btn1" value="Calcular" onclick="calcular()">
+        <form id="formulario">
+            <label for="txtDados">Dados</label>
+            <input type="text" name="txtDados" id="txtDados">
+            <br>
+
+            <label for="txtNomeVar">Nome da Variável Pesquisada</label>
+            <input type="text" name="txtNomeVar" id="txtNomeVar">
+            <br>
+
+            <label for="txtNomeFi">Nome da Fi</label>
+            <input type="text" name="txtNomeFi" id="txtNomeFi">
+            <br>
+
+            <input type="radio" name="radioTipoPesq" id="pop" value="POP" onclick="" checked>
+            <label for="pop">População</label>
+            <input type="radio" name="radioTipoPesq" id="ams" value="AMS" onclick="" >
+            <label for="ams">Amostra</label>
+            <br>
+
+            <input type="radio" name="radioTipoVar" id="QttDisc" value="DSC" onclick="desabilitarOrdem()" checked>
+            <label for="QttDisc">Quantitativa Discreta</label>
+            <input type="radio" name="radioTipoVar" id="QttCont" value="CNT" onclick="desabilitarOrdem()">
+            <label for="QttCont">Quantitativa Contínua</label>
+            <input type="radio" name="radioTipoVar" id="QltOrd" value="ORD" onclick="habilitarOrdem()">
+            <label for="QltOrd">Qualitativa Ordinal</label>
+            <input type="radio" name="radioTipoVar" id="QltNom" value="NML" onclick="desabilitarOrdem()">
+            <label for="QltNom">Qualitativa Nominal</label>
+            <br>
+
+            <label for="txtOrdem">Ordem</label>
+            <input type="text" name="txtOrdem" id="txtOrdem" disabled>
+            <br>
+
+            <input type="radio" name="radioSepa" id="quartil" value="Q" onclick="clickQuartil()" checked>
+            <label for="quartil">Quartil</label>
+            <input type="radio" name="radioSepa" id="quintil" value="K" onclick="clickQuintil()">
+            <label for="quintil">Quintil</label>
+            <input type="radio" name="radioSepa" id="decil" value="D" onclick="clickDecil()">
+            <label for="decil">Decil</label>
+            <input type="radio" name="radioSepa" id="porcentil" value="P" onclick="clickPorcentil()">
+            <label for="porcentil">Porcentil</label>
+            <br>
+
+            <input type="range" min="0" max="100" step="25" value="0" id="rangeSepa" onchange="changeSlider()">
+            <label for="rangeSepa" id="labelRange"></label>
+            <br>
+
+        <button type="button" name="btnMain" id="btnMain" onclick="main()">Calcular</button>
+        </form>
+        <br>
+        <br>
+
         <div id="dTabela"></div>
         <br>
         <div class="grafh-container" style="position: relative; height:20vh; width:40vw">

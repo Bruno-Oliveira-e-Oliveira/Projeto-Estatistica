@@ -1,32 +1,12 @@
 //Funcao que ordena dados Quantitativos
-function ordenarQtt(dados){
-    var desordenado = true;
-
-    while (desordenado) {
-        var aux;
-
-        for (var i = 0; i < dados.length; i++) {
-
-            if (dados[i] > dados[i+1]) {
-                aux = dados[i+1];
-                dados[i+1] = dados[i];
-                dados[i] = aux;
-                break;
-            }
-
-            if (i == (dados.length-1)) {
-                desordenado = false;
-            }
-
-        }
-    }
-    return dados;
+function ordenarQtt(a,b){
+    return a - b;
 }
 
-
-//Funcao que ordena dados Qualitativos ordinais
+//Funcao que ordena dados Qualitativos ordinais usando como referencia o vetor ordem
 function ordenarQltOrd(dados,ordem,posicao){
     var aux;
+    console.log(ordem);
 
     if (posicao < 0) {
         return dados;
@@ -46,7 +26,6 @@ function ordenarQltOrd(dados,ordem,posicao){
 //Funcao que define as classes, as variaveis e a frequencia simples da variavel pesquisada do tipo continua
 function calcularVarContinua(){
     var fi = [];
-
 
     //1° Passo: Amplitude
     var amp = dados[dados.length-1] - dados[0];
@@ -89,37 +68,20 @@ function calcularVarContinua(){
     }
 
     // Calcular as frequencias simples
-    var cont = 0;
-    var contFi = 0;
+    var contFi;
 
-    for (var i = 0; i < dados.length; i++) {
-        if (dados[i] >= varIni[cont] && dados[i] < varFim[cont]) {
-            contFi++;
-        }else {
-            fi.push(contFi);
-            contFi = 1;
-            cont++;
+    for (var i = 0; i < varIni.length; i++) {
+        contFi = 0;
+        for (var j = 0; j < dados.length; j++) {
+            if (dados[j] >= varIni[i] && dados[j] < varFim[i]) {
+                contFi++;
+            }
         }
-
-
-        if (i == (dados.length-1)) {
-            fi.push(contFi);
-        }
-
+        fi.push(contFi);
     }
 
     return [classes,varIni,varFim,fi];
 
-}
-
-// Função que soma valores de um vetor
-function sum(vet){
-    var soma = 0;
-    for (var i = 0; i < vet.length; i++) {
-        soma += vet[i];
-    }
-
-    return soma;
 }
 
 //Funcao que calcula as variaveis e frequencias
@@ -157,15 +119,20 @@ function calcularFreq(){
                 fi.push(contfi);
             }
         }
+
         mat.push(varPesq);
         mat.push(fi);
 
     }
 
     //Calcular frequencia relativa percentual, acumulada e acumulada percentual
-    var somaFi = sum(mat[posFi]);
+    var somaFi = 0;
     var num = 0;
     var soma = 0;
+
+    for (var i = 0; i < mat[posFi].length; i++) {
+        somaFi += mat[posFi][i];
+    }
 
     fac.push(mat[posFi][0]);
 
@@ -241,7 +208,7 @@ function calcularMedidasEst(matriz){
 
     //Caso seja Discreta
     if (tipoVar == "DSC") {
-        var somaFi = sum(matriz[1]);
+        var somaFi = matriz[3][matriz[3].length -1];
         var moda = [];
         var maior = matriz[1][0];
         var pos = somaFi/2;
@@ -281,18 +248,18 @@ function calcularMedidasEst(matriz){
     // Caso seja continua
     }else if (tipoVar == "CNT") {
         var pMedio = [];
-        var somaFi = sum(matriz[3]);
-        var posicao = somaFi/2;
-        var posMediana;
+        var somaFi = matriz[5][matriz[5].length -1];
+        var posicao = [somaFi/2, somaFi/2 + 1];
+        var posMediana = new Array(2);
+        var posModa = [];
         var intervalo = matriz[2][0] - matriz[1][0];
-        var facAnt;
+        var facAnt = [];
         var maior = matriz[3][0];
-        var fiAnt;
-        var fiPost;
         var modaConv = [];
         var modaPearson;
-        var modaKing;
-        var modaCzuber;
+        var modaKing = [];
+        var modaCzuber = [];
+
 
         //Calcula o ponto médio das variaveis, calcula a media, encontra o maior valor das fi e
         //encontra a posição da mediana
@@ -300,8 +267,11 @@ function calcularMedidasEst(matriz){
             pMedio.push((matriz[1][i] + matriz[2][i])/2);
             media += pMedio[i] * matriz[3][i];
 
-            if (matriz[5][i] >= posicao && posMediana == null) {
-                posMediana = i;
+            if (matriz[5][i] >= posicao[0] && posMediana[0] == null) {
+                posMediana[0] = i;
+            }
+            if (matriz[5][i] >= posicao[1] && posMediana[1] == null) {
+                posMediana[1] = i;
             }
 
             if (maior < matriz[3][i]) {
@@ -313,13 +283,21 @@ function calcularMedidasEst(matriz){
 
         //Testa para ver se a classe da mediana é a primeira posição do vetor e trata para
         //que não ocorra acesso a posições que não existem,e calcula a mediana.
-        if (posMediana == 0) {
-            facAnt = 0;
+        if (posMediana[0] == 0) {
+            facAnt.push(0);
         }else {
-            facAnt = matriz[5][posMediana-1];
+            facAnt.push(matriz[5][posMediana[0]-1]);
         }
 
-        mediana = matriz[1][posMediana] + (((posicao - facAnt) / matriz[3][posMediana]) * intervalo);
+        if (posMediana[1] == 0) {
+            facAnt.push(0);
+        }else {
+            facAnt.push(matriz[5][posMediana[1]-1]);
+        }
+
+        mediana = matriz[1][posMediana[0]] + (((posicao[0] - facAnt[0]) / matriz[3][posMediana[0]]) * intervalo);
+        mediana += matriz[1][posMediana[1]] + (((posicao[0] - facAnt[1]) / matriz[3][posMediana[1]]) * intervalo);
+        mediana = parseFloat((mediana/2).toFixed(2));
 
         //Calcula as 4 modas, o desvio padrao e o coeficiente de variacao
         for (var i = 0; i < matriz[0].length; i++) {
@@ -327,32 +305,50 @@ function calcularMedidasEst(matriz){
 
             if (matriz[3][i] == maior) {
                 modaConv.push(pMedio[i]);
+                posModa.push(i);
+            }
 
+        }
+
+        if (modaConv.length == matriz[0].length) {
+            modaConv = "Amodal";
+        }
+
+        //Testa se a moda convencional não é amodal
+        if (modaConv != "Amodal") {
+            var fiAnt;
+            var fiPost;
+            var valor;
+
+            for (var i = 0; i < modaConv.length; i++) {
                 //Testa se a classe modal é a primeira ou a última posição do vetor para que não haja acesso
                 //a posições que não existem.
-                if (i == 0) {
+                if (posModa[i] == 0) {
                     fiAnt = 0;
                 }else {
-                    fiAnt = matriz[3][i-1];
+                    fiAnt = matriz[3][posModa[i]-1];
                 }
 
-                if (i == matriz[0].length -1) {
+                if (posModa[i] == matriz[0].length -1) {
                     fiPost = 0;
                 }else {
-                    fiPost = matriz[3][i+1];
+                    fiPost = matriz[3][posModa[i]+1];
                 }
-                //Temporário
-                modaKing = matriz[1][i] + ((fiPost) / (fiAnt + fiPost)) * intervalo;
-                modaKing = parseFloat((modaKing).toFixed(2));
-                modaCzuber = matriz[1][i] + ((matriz[3][i] - fiAnt) / ((matriz[3][i] - fiAnt) + (matriz[3][i] - fiPost))) * intervalo;
-                modaCzuber = parseFloat((modaCzuber).toFixed(2));
-            }
 
-            if (modaConv.length == matriz[0].length) {
-                modaConv = null;
+                valor = matriz[1][posModa[i]] + ((fiPost) / (fiAnt + fiPost)) * intervalo;
+                modaKing.push(parseFloat((valor).toFixed(2)));
+
+                valor = matriz[1][posModa[i]] + ((matriz[3][posModa[i]] - fiAnt) / ((matriz[3][posModa[i]] - fiAnt) + (matriz[3][posModa[i]] - fiPost))) * intervalo;
+                modaCzuber.push(parseFloat((valor).toFixed(2)));
+
             }
+            modaPearson = parseFloat((3 * mediana - 2 * media).toFixed(2));
+        }else {
+            modaPearson = "Amodal";
+            modaKing = "Amodal";
+            modaCzuber = "Amodal";
         }
-        modaPearson = parseFloat((3 * mediana - 2 * media).toFixed(2));
+
     }
 
     //Diferencia caso seja populacao ou amostra
@@ -375,9 +371,6 @@ function calcularMedidasEst(matriz){
     console.log("moda Czuber "+modaCzuber);
     console.log("Desvio Padrao "+desvioPadrao);
     console.log("CV "+coeficienteVar);
-
-    //Calcula as Separatrizes
-
 }
 
 //Gera o gráfico
