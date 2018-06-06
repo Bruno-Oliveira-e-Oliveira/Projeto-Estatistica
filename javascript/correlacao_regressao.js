@@ -1,11 +1,12 @@
-//Função principal dos calculos da Correlacao e Regressao
-function calcularCorrelacao_Regressao() {
-    //temporario
-    calcCorr_Regr();
+//Função de validação da Correlacao e Regressao
+function validacaoCorrRegr() {
+    var xHist = [33,25,24,18,12,10,8,4];
+    var yHist = [300,400,500,600,700,800,900,1000];
+    calcCorr_Regr(xHist,yHist);
 }
 
 //Calcula correlação e regressão
-function calcCorr_Regr(){
+function calcCorr_Regr(xHist,yHist){
     var somaVet = function(vet){
         var soma = 0;
         for (var i = 0; i < vet.length; i++) {

@@ -58,7 +58,6 @@ function calcularDescritivas(){
         for (var i = 0; i < medEst.length; i++) {
             var label = document.getElementById("label"+texto+(i+1));
             label.innerHTML = medEst[i];
-            console.log(medEst.length);
         }
 
     }
@@ -325,7 +324,7 @@ function medidasEst(matriz){
             }
 
             if (moda.length == matriz[0].length) {
-                moda = null;
+                moda = "Amodal";
             }
         }
         medidas = [media,mediana,moda];
