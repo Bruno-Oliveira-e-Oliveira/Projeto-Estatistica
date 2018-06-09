@@ -10,135 +10,144 @@
     <script type="text/javascript" src="javascript/correlacao_regressao.js" ></script>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <script type="text/javascript">
-        //Descritivas
-        //var dados = "5;6;5;4;1;5;2;5;2";
-        //var dados = "3;5;6;5;4;4;4;10;12;13;14;17;15;16;14;12;17;17;17;18;16;14;12;14;12;22;21;20;20;18";
-        //var dados = "0;0;0;0;1;0;0;1;1;0;1;1;1;1"
-        //var dados = "bom;medio;ruim;medio;bom;medio;ruim;ruim"
-        var dados = "142;157;150;158;156;159;160;157;160;158;156;148;156;147;151;154;149;159;148;150;161;153;144;154;145;152;154;152;153;154;149;155;152;160;154;157;156;155;156;143;155;161;162;155;159;153;145;149;152;157";
-        var tipoVar = "CNT";   //DSC ; CNT ; ORD; NML
-        var tipoPesq = "POP";  // AMS ; POP
-        var nomeVar;
-        var nomeFi;
-        var ordem = ["bom","medio","ruim"];
-        var tipoSeparatriz; // Q;K;D;P
-        var valorSeparatriz;
-        var matriz;
-        var medEst;
-        var respostaSep;
-        //Correlação e Regressão
-        var xHist;
-        var yHist;
-        var coefLinear;
-        var maiorRegr;
-        var menorRegr;
-        var a;
-        var b;
+    //Descritivas
+    //var dados = "5;6;5;4;1;5;2;5;2";
+    //var dados = "3;5;6;5;4;4;4;10;12;13;14;17;15;16;14;12;17;17;17;18;16;14;12;14;12;22;21;20;20;18";
+    //var dados = "0;0;0;0;1;0;0;1;1;0;1;1;1;1"
+    //var dados = "bom;medio;ruim;medio;bom;medio;ruim;ruim"
+    var dados = "142;157;150;158;156;159;160;157;160;158;156;148;156;147;151;154;149;159;148;150;161;153;144;154;145;152;154;152;153;154;149;155;152;160;154;157;156;155;156;143;155;161;162;155;159;153;145;149;152;157";
+    var tipoVar = "CNT";   //DSC ; CNT ; ORD; NML
+    var tipoPesq = "POP";  // AMS ; POP
+    var nomeVar;
+    var nomeFi;
+    var ordem = ["bom","medio","ruim"];
+    var tipoSeparatriz; // Q;K;D;P
+    var valorSeparatriz;
+    var matriz;
+    var medEst;
+    var respostaSep;
+    //Correlação e Regressão
+    var xHist;
+    var yHist;
+    var coefLinear;
+    var maiorRegr;
+    var menorRegr;
+    var a;
+    var b;
 
-        function scrollTop() {
-            window.scrollTo(0, 0);
+    function scrollTop() {
+        window.scrollTo(0, 0);
+    }
+
+    function mostrarDiv(esconde,mostra){
+        document.getElementById(esconde).style.display = "none";
+        document.getElementById(mostra).style.display = "block";
+    }
+
+    function clickDescritivas(){
+        mostrarDiv("inicial","entrada");
+        scrollTop();
+    }
+
+    function clickProbabilidades(){
+        mostrarDiv("inicial","dDist");
+        scrollTop();
+        document.getElementById("btncalcDist").disabled = true;
+    }
+
+    function clickModelagem(){
+        mostrarDiv("inicial","modelagem")
+        scrollTop();
+        document.getElementById("btnInserirDados").disabled = true;
+    }
+
+    function habilitarOrdem() {
+        document.getElementById("txtOrdem").disabled = false;
+    }
+
+    function desabilitarOrdem() {
+        document.getElementById("txtOrdem").disabled = true;
+    }
+
+    function clickQuartil(){
+        var label = document.getElementById('labelRange');
+        var range = document.getElementById("rangeSepa");
+        range.step = 25;
+        range.value = 0;
+        label.innerHTML = "Q0";
+    }
+
+    function clickQuintil(){
+        var label = document.getElementById('labelRange');
+        var range = document.getElementById("rangeSepa");
+        range.step = 20;
+        range.value = 0;
+        label.innerHTML = "K0";
+    }
+
+    function clickDecil(){
+        var label = document.getElementById('labelRange');
+        var range = document.getElementById("rangeSepa");
+        range.step = 10;
+        range.value = 0;
+        label.innerHTML = "D0";
+    }
+
+    function clickPorcentil(){
+        var label = document.getElementById('labelRange');
+        var range = document.getElementById("rangeSepa");
+        range.step = 1;
+        range.value = 0;
+        label.innerHTML = "P0";
+    }
+
+    function changeSlider(){
+        var form = document.getElementById("formulario");
+        var range = form.rangeSepa;
+        var sel = form.selSepa;
+        var label = document.getElementById('labelRange');
+        var num;
+
+        if (sel.value == "Q") {
+            num = 4;
+        }else if (sel.value == "K") {
+            num = 5;
+        }else if (sel.value == "D") {
+            num = 10;
+        }else if (sel.value == "P") {
+            num = 100;
         }
+        label.innerHTML = sel.value + ((num * range.value)/100);
+    }
 
-        function mostrarDiv(esconde,mostra){
-            document.getElementById(esconde).style.display = "none";
-            document.getElementById(mostra).style.display = "block";
-        }
 
-        function clickDescritivas(){
-            mostrarDiv("inicial","entrada");
-            scrollTop();
-        }
 
-        function clickModelagem(){
-            mostrarDiv("inicial","modelagem")
-            scrollTop();
-        }
+    function clickNormal(){
+        document.getElementById("dBinomial").style.display = "none";
+        document.getElementById("dUniforme").style.display = "none";
+        document.getElementById("dNormal").style.display = "block";
+        document.getElementById("btncalcDist").disabled = false;
+        document.getElementById("saidaDist").style = "display : none;"
+        limparSaida();
+    }
 
-        function habilitarOrdem() {
-            document.getElementById("txtOrdem").disabled = false;
-        }
+    function clickUniforme(){
+        document.getElementById("dBinomial").style.display = "none";
+        document.getElementById("dNormal").style.display = "none";
+        document.getElementById("dUniforme").style.display = "block";
+        document.getElementById("btncalcDist").disabled = false;
+        document.getElementById("saidaDist").style = "display : none;"
+        limparSaida();
+    }
 
-        function desabilitarOrdem() {
-            document.getElementById("txtOrdem").disabled = true;
-        }
-
-        function clickQuartil(){
-            var label = document.getElementById('labelRange');
-            var range = document.getElementById("rangeSepa");
-            range.step = 25;
-            range.value = 0;
-            label.innerHTML = "Q0";
-        }
-
-        function clickQuintil(){
-            var label = document.getElementById('labelRange');
-            var range = document.getElementById("rangeSepa");
-            range.step = 20;
-            range.value = 0;
-            label.innerHTML = "K0";
-        }
-
-        function clickDecil(){
-            var label = document.getElementById('labelRange');
-            var range = document.getElementById("rangeSepa");
-            range.step = 10;
-            range.value = 0;
-            label.innerHTML = "D0";
-        }
-
-        function clickPorcentil(){
-            var label = document.getElementById('labelRange');
-            var range = document.getElementById("rangeSepa");
-            range.step = 1;
-            range.value = 0;
-            label.innerHTML = "P0";
-        }
-
-        function changeSlider(){
-            var form = document.getElementById("formulario");
-            var range = form.rangeSepa;
-            var sel = form.selSepa;
-            var label = document.getElementById('labelRange');
-            var num;
-
-            if (sel.value == "Q") {
-                num = 4;
-            }else if (sel.value == "K") {
-                num = 5;
-            }else if (sel.value == "D") {
-                num = 10;
-            }else if (sel.value == "P") {
-                num = 100;
-            }
-            label.innerHTML = sel.value + ((num * range.value)/100);
-        }
-
-        function checarVariavel(){
-            if (tipoVar == "DSC") {
-                if (matriz[0].length == 2) {
-                    document.getElementById("labelTipoDist").innerHTML= "Distribuição Binomial"
-                    document.getElementById("calcDist").disabled = false;
-                    document.getElementById('dBinomial').style = "display: block;"
-                } else {
-                    document.getElementById("labelTipoDist").innerHTML= "Não há como calcular nenhum tipo de Distribuição.";
-                }
-
-            }else if (tipoVar == "CNT") {
-                document.getElementById('dSelDist').style = "display: block;"
-            }
-        }
-
-        function clickNormal(){
-            mostrarDiv('dUniforme','dNormal');
-            document.getElementById("calcDist").disabled = false;
-            limparSaida();
-        }
-
-        function clickUniforme(){
-            mostrarDiv('dNormal','dUniforme');
-            document.getElementById("calcDist").disabled = false;
-            limparSaida();
-        }
+    function clickBinomial(){
+        document.getElementById("dUniforme").style.display = "none";
+        document.getElementById("dNormal").style.display = "none";
+        document.getElementById("dBinomial").style.display = "block";
+        document.getElementById("btncalcDist").disabled = false;
+        document.getElementById("saidaDist").style = "display : none;"
+        limparSaida();
+    }
 
     </script>
     <title>Página html</title>
@@ -174,48 +183,16 @@
                     <h4>Escolha uma das opções abaixo:</h4>
                     <div style= "margin-top: 80px">
                         <button type="button" class="btn btn-dark btn-block" onclick="clickDescritivas()">Descritivas</button>
-                        <button type="button" class="btn btn-dark btn-block" onclick="">Probabilidades</button>
+                        <button type="button" class="btn btn-dark btn-block" onclick="clickProbabilidades()">Probabilidades</button>
                         <button type="button" class="btn btn-dark btn-block" onclick="clickModelagem()" >Correlação e Regressão</button>
                     </div>
-                </div>
-
-                <div id="modelagem" style= "display:none;">
-                    <div id="entradaCorrRegr">
-                        <form>
-                            <div class="form-group">
-                                <label class="control-label" for="txtX">X</label>
-                                <input type="text" class="form-control" name="txtX" id="txtX" placeholder="Use ; para separar os dados.">
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label" for="txtY">Y</label>
-                                <input type="text" class="form-control" name="txtY" id="txtY" placeholder="Use ; para separar os dados.">
-                            </div>
-                        </form>
-                    </div>
-
-                    <div>
-                        <canvas id="grafReg"></canvas>
-                    </div>
-
-                    <div class="row" id="saidaCorrRegr" style= "display: none; margin-top: 20px;">
-                        <div class="col-sm-6 d-inline-block" style= "display: block;">
-                            <h3>Coeficiente Linear</h3>
-                            <label class="control-label" id="labelCoefL" ></label>
-                        </div>
-                        <div class="col-sm-6 d-inline-block" style= "display: block;">
-                            <h3>Equação da Reta</h3>
-                            <label class="control-label" id="labelEqReta"></label>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-dark btn-block"  id="btnCorrReg" onclick="validacaoCorrRegr()">Calcular</button>
-                    <button type="button" class="btn btn-dark btn-block"  id="btnInserirDados" onclick="inserirDados()" disabled>Inserir Dados no Grafico</button>
                 </div>
 
                 <div id="entrada" style= "display:none;">
                     <form id="formulario" >
                         <div class="form-group">
                             <label class="control-label" for="txtDados"><strong>Dados</strong></label>
-                            <textarea type="text" class="form-control" name="txtDados" id="txtDados" placeholder="Use ; para separar os dados."></textarea>
+                            <textarea type="text" class="form-control" name="txtDados" id="txtDados" placeholder="Use ponto e vírgula para separar os dados."></textarea>
                             <input type="file" class="form-control-file border" accept=".csv , .txt">
                         </div>
 
@@ -248,7 +225,7 @@
 
                         <div class="form-group">
                             <label class="control-label" for="txtOrdem"><strong>Ordem</strong></label>
-                            <input type="text" class="form-control" name="txtOrdem" id="txtOrdem" placeholder="Use ; para separar os dados." disabled>
+                            <input type="text" class="form-control" name="txtOrdem" id="txtOrdem" placeholder="Use ponto e vírgula para separar os dados." disabled>
                         </div>
 
                         <div class="form-group">
@@ -360,104 +337,136 @@
                         </div>
                         <div id="medSep"></div>
                     </div>
+                </div>
 
-                    <button type="button" class="btn btn-dark btn-block" data-toggle="modal" data-target="#myModal" onclick="checarVariavel()">Probabilidades</button>
-                    <!-- The Modal -->
-                    <div class="modal" id="myModal">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
+                <div id="dDist" style= "display: none;" >
+                    <form id="formularioDist">
+                        <label id="labelTipoDist" class="control-label"></label>
+                        <div class="form-group" id="dSelDist">
+                            <label class="control-label">Tipo de Distribuição</label>
+                            <select class="form-control" id="selTipoDist">
+                                <option value="DN" onclick="clickNormal()">Distribuição Normal</option>
+                                <option value="DU" onclick="clickUniforme()">Distribuição Uniforme</option>
+                                <option value="DB" onclick="clickBinomial()">Distribuição Binomial</option>
+                            </select>
+                        </div>
 
-                                <div class="modal-header">
-                                    <h4 class="modal-title"><strong>Probabilidades</strong></h4>
-                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                </div>
-
-                                <div class="modal-body" >
-                                    <form id="formularioDist">
-                                        <label id="labelTipoDist" class="control-label"></label>
-                                        <div class="form-group" id="dSelDist" style= "display: none;">
-                                            <label class="control-label">Tipo de Distribuição</label>
-                                            <select class="form-control" id="selTipoDist">
-                                                <option value="DN" onclick="clickNormal()">Distribuição Normal</option>
-                                                <option value="DU" onclick="clickUniforme()">Distribuição Uniforme</option>
-                                            </select>
-                                        </div>
-
-                                        <div id="dBinomial" style= "display: none;">
-                                            <div class="form-group">
-                                                <label class="control-label" for="txtN">N:</label>
-                                                <input type="text" class="form-control"  name="txtN" id="txtN">
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="control-label" for="txtK">K:</label>
-                                                <input type="text" class="form-control" placeholder="Use ; para separar os dados." name="txtK" id="txtK">
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="control-label" for="txtP">P:</label>
-                                                <input type="text" class="form-control"  name="txtP" id="txtP">
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="control-label" for="txtQ">Q:</label>
-                                                <input type="text" class="form-control"  name="txtQ" id="txtQ">
-                                            </div>
-                                        </div>
-
-                                        <div id="dNormal" style= "display: none;">
-                                            <div class="form-group">
-                                                <label class="control-label" for="txtNTrans">Dados</label>
-                                                <input type="text" class="form-control" name="txtNTrans" id="txtNTrans" placeholder="Use ; para separar os dados.">
-                                            </div>
-                                            <div class="form-group" >
-                                                <label class="control-label">Opção</label>
-                                                <select class="form-control" id="selOPNormal">
-                                                    <option value="entre">Entre</option>
-                                                    <option value="maiorQ">Maior Que</option>
-                                                    <option value="menorQ">Menor Que</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div id="dUniforme" style= "display: none;">
-                                            <div class="form-group">
-                                                <label class="control-label" for="txtNIntervalo">Números do Intervalo </label>
-                                                <input type="text" class="form-control" name="txtNIntervalo" id="txtNIntervalo" placeholder="Use ; para separar os dados.">
-                                            </div>
-                                            <div class="form-group" >
-                                                <label class="control-label">Opção</label>
-                                                <select class="form-control" id="selOPUniforme">
-                                                    <option value="entre">Entre</option>
-                                                    <option value="maiorQ">Maior Que</option>
-                                                    <option value="menorQ">Menor Que</option>
-                                                    <option value="deAte">De Até</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div id="saidaDist" style= "display: none;">
-                                            <label class="control-label">Probabilidade</label>
-                                            <label class="control-label" id="probResp"></label>
-                                            <span class="d-block" id="mediaDU"></span>
-                                            <span class="d-block" id="desvioDU"></span>
-                                            <span class="d-block" id="CoefDU"></span>
-                                        </div>
-                                    </form>
-                                </div>
-
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-dark" id="calcDist" onclick="validacaoDist()" disabled>Calcular</button>
-                                    <button type="button" class="btn btn-dark" data-dismiss="modal" onclick="limparSaida()" >Sair</button>
-                                </div>
-
+                        <div id="dBinomial" style= "display: none;">
+                            <div class="form-group">
+                                <label class="control-label" for="txtN">N:</label>
+                                <input type="text" class="form-control"  name="txtN" id="txtN">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" for="txtK">K:</label>
+                                <input type="text" class="form-control" placeholder="Use ponto e vírgula para separar os dados." name="txtK" id="txtK">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" for="txtP">P:</label>
+                                <input type="text" class="form-control"  name="txtP" id="txtP">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" for="txtQ">Q:</label>
+                                <input type="text" class="form-control"  name="txtQ" id="txtQ">
                             </div>
                         </div>
 
-                    </div>
+                        <div id="dNormal" style= "display: none;">
+                            <div class="form-group">
+                                <label class="control-label" for="txtNTrans">Dados</label>
+                                <input type="text" class="form-control" name="txtNTrans" id="txtNTrans" placeholder="Use ponto e vírgula para separar os dados.">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" for="txtMediaDN">Média</label>
+                                <input type="text" class="form-control" name="txtMediaDN" id="txtMediaDN">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" for="txtDesvioDN">Desvio Padrão</label>
+                                <input type="text" class="form-control" name="txtDesvioDN" id="txtDesvioDN">
+                            </div>
+                            <div class="form-group" >
+                                <label class="control-label">Opção</label>
+                                <select class="form-control" id="selOPNormal">
+                                    <option value="entre">Entre</option>
+                                    <option value="maiorQ">Maior Que</option>
+                                    <option value="menorQ">Menor Que</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="dUniforme" style= "display: none;">
+                            <div class="form-group">
+                                <label class="control-label" for="txtNIntervalo">Números do Intervalo </label>
+                                <input type="text" class="form-control" name="txtNIntervalo" id="txtNIntervalo" placeholder="Use ponto e vírgula para separar os dados.">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" for="txtPMin">Ponto Mínimo</label>
+                                <input type="text" class="form-control" name="txtPMin" id="txtPMin">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" for="txtPMax">Ponto Máximo</label>
+                                <input type="text" class="form-control" name="txtPMax" id="txtPMax">
+                            </div>
+                            <div class="form-group" >
+                                <label class="control-label">Opção</label>
+                                <select class="form-control" id="selOPUniforme">
+                                    <option value="entre">Entre</option>
+                                    <option value="maiorQ">Maior Que</option>
+                                    <option value="menorQ">Menor Que</option>
+                                    <option value="deAte">De Até</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="saidaDist" style= "display: none;">
+                            <label class="control-label"><strong>Probabilidade:</strong></label>
+                            <label class="control-label" id="probResp"></label>
+                            <span class="d-block" id="mediaDU"></span>
+                            <span class="d-block" id="desvioDU"></span>
+                            <span class="d-block" id="CoefDU"></span>
+                        </div>
+                        <button type="button" class="btn btn-dark btn-block" id="btncalcDist" onclick="validacaoDist()">Calcular</button>
+                    </form>
                 </div>
-                <div class="col-sm-2"></div>
+
+                <div id="modelagem" style= "display:none;">
+                    <div id="entradaCorrRegr">
+                        <form>
+                            <div class="form-group">
+                                <label class="control-label" for="txtX">X</label>
+                                <input type="text" class="form-control" name="txtX" id="txtX" placeholder="Use ponto e vírgula para separar os dados.">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label" for="txtY">Y</label>
+                                <input type="text" class="form-control" name="txtY" id="txtY" placeholder="Use ponto e vírgula para separar os dados.">
+                            </div>
+                        </form>
+                    </div>
+
+                    <div>
+                        <canvas id="grafReg"></canvas>
+                    </div>
+
+                    <div class="row" id="saidaCorrRegr" style= "display: none; margin-top: 20px;">
+                        <div class="col-sm-6 d-inline-block" style= "display: block;">
+                            <h3>Coeficiente Linear</h3>
+                            <label class="control-label" id="labelCoefL" ></label>
+                        </div>
+                        <div class="col-sm-6 d-inline-block" style= "display: block;">
+                            <h3>Equação da Reta</h3>
+                            <label class="control-label" id="labelEqReta"></label>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-dark btn-block"  id="btnCorrReg" onclick="validacaoCorrRegr()">Calcular</button>
+                    <button type="button" class="btn btn-dark btn-block"  id="btnInserirDados" onclick="inserirDados()">Inserir Dados no Grafico</button>
+                </div>
+
+
             </div>
+            <div class="col-sm-2"></div>
         </div>
+    </div>
 
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-        <script src="javascript/bootstrap.min.js"></script>
-    </body>
-    </html>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="javascript/bootstrap.min.js"></script>
+</body>
+</html>

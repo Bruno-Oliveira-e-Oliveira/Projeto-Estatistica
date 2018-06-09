@@ -7,7 +7,7 @@ function validacaoDist(){
     tipoDist = document.getElementById("selTipoDist").value;
     formulario = document.getElementById("formularioDist");
 
-    if (tipoVar == "DSC") {
+    if (tipoDist == "DB") {
         if (formulario.txtN.value == "") {
             valido = false;
         }else if (formulario.txtK.value == "") {
@@ -38,13 +38,16 @@ function validacaoDist(){
         q = Number(q.replace(",","."));
 
         respostaDist = distBinomial(tipoDist,n,k,p,q);
-        mostrarDiv("dBinomial","saidaDist");
         document.getElementById("probResp").innerHTML = respostaDist+"%";
 
     }else if (tipoDist == "DU") {
         if (formulario.txtNIntervalo.value == "") {
             valido = false;
         }else if (formulario.selOPUniforme.value == "") {
+            valido = false;
+        }else if (formulario.txtPMin.value == "") {
+            valido = false;
+        }else if (formulario.txtPMax.value == "") {
             valido = false;
         }
 
@@ -55,6 +58,8 @@ function validacaoDist(){
 
         var numIntervalo = formulario.txtNIntervalo.value;
         var opU = formulario.selOPUniforme.value;
+        var pMin = Number(formulario.txtPMin.value);
+        var pMax = Number(formulario.txtPMax.value);
         numIntervalo = numIntervalo.split(";");
         if (numIntervalo.length >= 1) {
             for (var i = 0; i < numIntervalo.length; i++) {
@@ -64,8 +69,7 @@ function validacaoDist(){
             numIntervalo = [Number(numIntervalo)];
         }
 
-        var pontos = [dados[0],dados[dados.length-1]]; //Pega as extremidades dos dados ordenados
-        respostaDist = distUniforme(tipoDist,numIntervalo,opU,pontos);
+        respostaDist = distUniforme(tipoDist,numIntervalo,opU,[pMin,pMax]);
 
         var labelMedia = document.createElement("label");
         var labelDesvio = document.createElement("label");
@@ -74,18 +78,21 @@ function validacaoDist(){
         labelDesvio.class = "control-label";
         labelCoef.class = "control-label";
         document.getElementById("probResp").innerHTML = respostaDist[0] +"%";
-        labelMedia.innerHTML = "Média: "+respostaDist[1];
-        labelDesvio.innerHTML = "Desvio Padrão: "+respostaDist[2];
-        labelCoef.innerHTML = "Coeficiente de Variação: "+respostaDist[3];
+        labelMedia.innerHTML = "<strong>Média:</strong> "+respostaDist[1];
+        labelDesvio.innerHTML = "<strong>Desvio Padrão:</strong> "+respostaDist[2];
+        labelCoef.innerHTML = "<strong>Coeficiente de Variação:</strong> "+respostaDist[3];
         document.getElementById("mediaDU").appendChild(labelMedia);
         document.getElementById("desvioDU").appendChild(labelDesvio);
         document.getElementById("CoefDU").appendChild(labelCoef);
-        mostrarDiv("dUniforme","saidaDist");
 
     }else if (tipoDist == "DN") {
         if (formulario.txtNTrans.value == "") {
             valido = false;
         }else if (formulario.selOPNormal.value == "") {
+            valido = false;
+        }else if (formulario.txtMediaDN.value == "") {
+            valido = false;
+        }else if (formulario.txtDesvioDN.value == "") {
             valido = false;
         }
 
@@ -93,9 +100,10 @@ function validacaoDist(){
             alert("Preencha todos os campos!!");
             return 0;
         }
-        //Tratar o erro de entrada em nTrans assim como na variavel anterior
 
         var nTrans = formulario.txtNTrans.value;
+        var mediaDN = Number(formulario.txtMediaDN.value);
+        var desvioDN = Number(formulario.txtDesvioDN.value);
         var op = formulario.selOPNormal.value;
         nTrans = nTrans.split(";");
         if (nTrans.length >= 1) {
@@ -106,11 +114,11 @@ function validacaoDist(){
             nTrans = [Number(nTrans)];
         }
 
-        respostaDist = distNormal(tipoDist,nTrans,op,medEst[0],medEst[6]);
-        mostrarDiv("dNormal","saidaDist");
+        respostaDist = distNormal(tipoDist,nTrans,op,mediaDN,desvioDN);
         document.getElementById("probResp").innerHTML = respostaDist+"%";
     }
-    document.getElementById("calcDist").disabled = true;
+    document.getElementById("saidaDist").style = "display : block;"
+
 }
 
 //Limpa as labels para outra execução
