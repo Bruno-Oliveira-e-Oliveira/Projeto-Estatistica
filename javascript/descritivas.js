@@ -62,6 +62,7 @@ function calcularDescritivas(){
 
     }
     mostrarDiv("entrada","saida");
+    scrollTop();
 }
 
 //Validação da entrada de dados

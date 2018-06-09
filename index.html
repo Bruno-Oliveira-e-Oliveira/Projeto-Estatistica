@@ -12,6 +12,7 @@
     <script type="text/javascript">
         //Descritivas
         //var dados = "5;6;5;4;1;5;2;5;2";
+        //var dados = "3;5;6;5;4;4;4;10;12;13;14;17;15;16;14;12;17;17;17;18;16;14;12;14;12;22;21;20;20;18";
         //var dados = "0;0;0;0;1;0;0;1;1;0;1;1;1;1"
         //var dados = "bom;medio;ruim;medio;bom;medio;ruim;ruim"
         var dados = "142;157;150;158;156;159;160;157;160;158;156;148;156;147;151;154;149;159;148;150;161;153;144;154;145;152;154;152;153;154;149;155;152;160;154;157;156;155;156;143;155;161;162;155;159;153;145;149;152;157";
@@ -25,8 +26,14 @@
         var matriz;
         var medEst;
         var respostaSep;
-
-
+        //Correlação e Regressão
+        var xHist;
+        var yHist;
+        var coefLinear;
+        var maiorRegr;
+        var menorRegr;
+        var a;
+        var b;
 
         function scrollTop() {
             window.scrollTo(0, 0);
@@ -35,15 +42,16 @@
         function mostrarDiv(esconde,mostra){
             document.getElementById(esconde).style.display = "none";
             document.getElementById(mostra).style.display = "block";
-            scrollTop();
         }
 
         function clickDescritivas(){
-            mostrarDiv("inicial","entrada")
+            mostrarDiv("inicial","entrada");
+            scrollTop();
         }
 
         function clickModelagem(){
             mostrarDiv("inicial","modelagem")
+            scrollTop();
         }
 
         function habilitarOrdem() {
@@ -165,14 +173,15 @@
                     <h1>Seja Bem Vindo Ao Sistema de Análise Estatística</h1>
                     <h4>Escolha uma das opções abaixo:</h4>
                     <div style= "margin-top: 80px">
-                        <button type="button" class="btn btn-dark btn-block" onclick="clickDescritivas()">Descritivas e Probabilidades</button>
+                        <button type="button" class="btn btn-dark btn-block" onclick="clickDescritivas()">Descritivas</button>
+                        <button type="button" class="btn btn-dark btn-block" onclick="">Probabilidades</button>
                         <button type="button" class="btn btn-dark btn-block" onclick="clickModelagem()" >Correlação e Regressão</button>
                     </div>
                 </div>
 
                 <div id="modelagem" style= "display:none;">
                     <div id="entradaCorrRegr">
-                        <form class="">
+                        <form>
                             <div class="form-group">
                                 <label class="control-label" for="txtX">X</label>
                                 <input type="text" class="form-control" name="txtX" id="txtX" placeholder="Use ; para separar os dados.">
@@ -184,11 +193,22 @@
                         </form>
                     </div>
 
-
                     <div>
                         <canvas id="grafReg"></canvas>
                     </div>
+
+                    <div class="row" id="saidaCorrRegr" style= "display: none; margin-top: 20px;">
+                        <div class="col-sm-6 d-inline-block" style= "display: block;">
+                            <h3>Coeficiente Linear</h3>
+                            <label class="control-label" id="labelCoefL" ></label>
+                        </div>
+                        <div class="col-sm-6 d-inline-block" style= "display: block;">
+                            <h3>Equação da Reta</h3>
+                            <label class="control-label" id="labelEqReta"></label>
+                        </div>
+                    </div>
                     <button type="button" class="btn btn-dark btn-block"  id="btnCorrReg" onclick="validacaoCorrRegr()">Calcular</button>
+                    <button type="button" class="btn btn-dark btn-block"  id="btnInserirDados" onclick="inserirDados()" disabled>Inserir Dados no Grafico</button>
                 </div>
 
                 <div id="entrada" style= "display:none;">
@@ -384,7 +404,7 @@
 
                                         <div id="dNormal" style= "display: none;">
                                             <div class="form-group">
-                                                <label class="control-label" for="txtNTrans">Número a ser Transformado</label>
+                                                <label class="control-label" for="txtNTrans">Dados</label>
                                                 <input type="text" class="form-control" name="txtNTrans" id="txtNTrans" placeholder="Use ; para separar os dados.">
                                             </div>
                                             <div class="form-group" >

@@ -1,12 +1,42 @@
 //Função de validação da Correlacao e Regressao
 function validacaoCorrRegr() {
-    var xHist = [33,25,24,18,12,10,8,4];
-    var yHist = [300,400,500,600,700,800,900,1000];
-    calcCorr_Regr(xHist,yHist);
+    xHist = document.getElementById("txtX").value;
+    yHist = document.getElementById("txtY").value;
+
+    if (xHist == "" || yHist == "") {
+        alert("Preencha todos os campos!!");
+        return 0;
+    }
+    xHist = xHist.split(";");
+    yHist = yHist.split(";");
+
+    if (xHist.length != yHist.length) {
+        alert("A quantidade de variáveis de X e Y são diferentes, verifique os dados fornecidos.");
+        return 0;
+    }
+
+    for (var i = 0; i < xHist.length; i++) {
+        xHist[i] = Number(xHist[i]);
+        yHist[i] = Number(yHist[i]);
+    }
+
+
+    //xHist = [33,25,24,18,12,10,8,4];
+    //yHist = [300,400,500,600,700,800,900,1000];
+
+
+    calcCorr_Regr();
+
+    document.getElementById("txtX").value = "";
+    document.getElementById("txtY").value = "";
+    document.getElementById("btnCorrReg").disabled = true;
+    document.getElementById("btnInserirDados").disabled = false;
+    document.getElementById("txtX").placeholder = "Insira apenas um dado de cada vez, em apenas um dos dois campos."
+    document.getElementById("txtY").placeholder = "Insira apenas um dado de cada vez, em apenas um dos dois campos."
 }
 
 //Calcula correlação e regressão
-function calcCorr_Regr(xHist,yHist){
+function calcCorr_Regr(){
     var somaVet = function(vet){
         var soma = 0;
         for (var i = 0; i < vet.length; i++) {
@@ -23,11 +53,8 @@ function calcCorr_Regr(xHist,yHist){
     var somaXY;
     var somaPy;
     var somaPx;
-    var coefLinear;
     var nAmostras = matrizHist[0].length;
     var eqReta;
-    var a;
-    var b;
     var regY;
     var regX;
 
@@ -50,42 +77,39 @@ function calcCorr_Regr(xHist,yHist){
     b = regY - a * regX;
     b = parseFloat(b.toFixed(2));
     eqReta = "Y = "+a+"X + "+b;
-    gerarGraficoReg(a,b,coefLinear);
+    gerarGraficoReg();
 
-    console.log("Coeficiente Linear: "+coefLinear);
-    console.log("Equação da reta: "+eqReta);
+    document.getElementById("labelCoefL").innerHTML = coefLinear;
+    document.getElementById("labelEqReta").innerHTML = eqReta;
+    document.getElementById("saidaCorrRegr").style = "display: block;";
 }
 
 //Gera o grafico da regressao
-function gerarGraficoReg(a,b,coefLinear){
+function gerarGraficoReg(){
     var ctx = document.getElementById('grafReg').getContext('2d');
     var dataS = [];
     var dataL = [];
-    var maior = yHist[0];
+    maiorRegr = yHist[0];
+    menorRegr = yHist[0];
 
     for (var i = 0; i < xHist.length; i++) {
         dataS.push({
             x: xHist[i],
             y: yHist[i]
         });
-        if (maior < yHist[i]) {
-            maior = yHist[i];
+        if (maiorRegr < yHist[i]) {
+            maiorRegr = yHist[i];
+        }
+        if (menorRegr > yHist[i]) {
+            menorRegr = yHist[i];
         }
     }
 
-    if (coefLinear > 0) {
-        dataL = [{
-            x:0, y:b
-        },{
-            x:(maior-b)/a, y:maior
-        }]
-    } else {
-        dataL = [{
-            x:0, y:b
-        },{
-            x:(-b/a), y:0
-        }]
-    }
+    dataL = [{
+        x:(menorRegr - b) /a, y: menorRegr
+    },{
+        x:(maiorRegr - b) /a, y: maiorRegr
+    }]
 
     var options = {
         legend: {
@@ -133,4 +157,33 @@ function gerarGraficoReg(a,b,coefLinear){
     });
 
 
+}
+
+
+function inserirDados(){
+    var x = document.getElementById("txtX").value;
+    var y = document.getElementById("txtY").value;
+    x = x.split(";");
+    y = y.split(";");
+
+    if ((x == "" && y == "") || (x != "" && y != "")) {
+        alert("Preencha apenas um dos campos, para que seja realizado o cálculo.");
+        return 0;
+    }else if (x.length > 1 || y.length > 1) {
+        alert("Digite apenas um número.");
+        return 0;
+    }else if (x != "") {
+        x = Number(x[0]);
+        y = a * x + b;
+    }else if (y != "") {
+        y = Number(y[0]);
+        x = (y - b)/a
+        x = parseFloat(x.toFixed(2));
+    }
+
+    xHist.push(x);
+    yHist.push(y);
+    document.getElementById("txtX").value = "";
+    document.getElementById("txtY").value = "";
+    gerarGraficoReg();
 }
