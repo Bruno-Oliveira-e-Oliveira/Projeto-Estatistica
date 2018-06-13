@@ -1,19 +1,20 @@
 //Função principal dos calculos das descritivas
 function calcularDescritivas(){
     var form = document.getElementById("formulario");
-    var valido = true//validacaoDesc(form);
+    var valido = validacaoDesc(form);
 
     if (valido) {
-        //dados = form.txtDados.value;
+        dados = form.txtDados.value;
         dados = dados.split(";")
-        //tipoVar = form.selTipoVar.value;
-        //tipoPesq = form.selTipoPesq.value;
+        tipoVar = form.selTipoVar.value;
+        tipoPesq = form.selTipoPesq.value;
         nomeVar = form.txtNomeVar.value;
         nomeFi = form.txtNomeFi.value;
-        //ordem = form.txtOrdem.value;
-        //ordem = ordem.split(";");
+        ordem = form.txtOrdem.value;
+        ordem = ordem.split(";");
         tipoSeparatriz = form.selSepa.value;
         valorSeparatriz = form.rangeSepa.value;
+        console.log(valorSeparatriz);
     } else {
         alert("Preencha todos os campos!");
         return 0;
@@ -73,11 +74,15 @@ function validacaoDesc(form) {
         return false;
     } else if (form.txtNomeFi.value == "") {
         return false;
-    } else if (form.radioTipoVar.value != "ORD") {
+    } else if (form.selTipoVar.value == "ORD") {
         if (form.txtOrdem.value == "") {
             return false;
         }
-    } else {
+    }else if (form.selTipoVar.value == "nulo") {
+        return false;
+    }else if (form.selTipoPesq.value == "nulo") {
+        return false;
+    }else {
         return true;
     }
 }

@@ -11,16 +11,12 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <script type="text/javascript">
     //Descritivas
-    //var dados = "5;6;5;4;1;5;2;5;2";
-    //var dados = "3;5;6;5;4;4;4;10;12;13;14;17;15;16;14;12;17;17;17;18;16;14;12;14;12;22;21;20;20;18";
-    //var dados = "0;0;0;0;1;0;0;1;1;0;1;1;1;1"
-    //var dados = "bom;medio;ruim;medio;bom;medio;ruim;ruim"
-    var dados = "142;157;150;158;156;159;160;157;160;158;156;148;156;147;151;154;149;159;148;150;161;153;144;154;145;152;154;152;153;154;149;155;152;160;154;157;156;155;156;143;155;161;162;155;159;153;145;149;152;157";
-    var tipoVar = "CNT";   //DSC ; CNT ; ORD; NML
-    var tipoPesq = "POP";  // AMS ; POP
+    var dados;
+    var tipoVar;   //DSC ; CNT ; ORD; NML
+    var tipoPesq;  // AMS ; POP
     var nomeVar;
     var nomeFi;
-    var ordem = ["bom","medio","ruim"];
+    var ordem;
     var tipoSeparatriz; // Q;K;D;P
     var valorSeparatriz;
     var matriz;
@@ -35,6 +31,33 @@
     var a;
     var b;
 
+    function lerArq(){
+        var arq = document.getElementById("fileDesc").files[0];
+        var reader = new FileReader();
+        reader.onload = function (e) {
+                 var txtDados = document.getElementById("txtDados");
+                 txtDados.value = reader.result;
+             }
+         reader.readAsText(arq);
+         document.getElementById("labelArqD").innerHTML = arq.name;
+    }
+
+    function lerArqCorr(){
+        var texto;
+        var arq = document.getElementById("fileCorr").files[0];
+        var reader = new FileReader();
+        reader.onload = function (e) {
+                 var txtX = document.getElementById("txtX");
+                 var txtY = document.getElementById("txtY");
+                 texto = reader.result;
+                 texto = texto.split("\n")
+                 txtX.value = texto[0];
+                 txtY.value = texto[1];
+             }
+         reader.readAsText(arq);
+         document.getElementById("labelArqC").innerHTML = arq.name;
+    }
+
     function scrollTop() {
         window.scrollTo(0, 0);
     }
@@ -46,12 +69,16 @@
 
     function clickDescritivas(){
         mostrarDiv("inicial","entrada");
+        document.getElementById("nullTipoPesq").selected = true;
+        document.getElementById("nullTipoVar").selected = true;
+        document.getElementById("nullSepa").selected = true;
         scrollTop();
     }
 
     function clickProbabilidades(){
         mostrarDiv("inicial","dDist");
         scrollTop();
+        document.getElementById("nullDist").selected = true;
         document.getElementById("btncalcDist").disabled = true;
     }
 
@@ -61,12 +88,47 @@
         document.getElementById("btnInserirDados").disabled = true;
     }
 
+    function verificarValorTipoVar(){
+        valor = document.getElementById("selTipoVar").value;
+        if (valor == "ORD" || valor == "NML") {
+            if (valor == "ORD") {
+                habilitarOrdem();
+            }
+            document.getElementById("selSepa").disabled = true;
+            document.getElementById("rangeSepa").disabled = true;
+            document.getElementById("rangeSepa").value = 0;
+            document.getElementById('labelRange').innerHTML = "Q0";
+        }else{
+            desabilitarOrdem();
+            document.getElementById("selSepa").disabled = false;
+        }
+    }
+
     function habilitarOrdem() {
         document.getElementById("txtOrdem").disabled = false;
     }
 
     function desabilitarOrdem() {
         document.getElementById("txtOrdem").disabled = true;
+    }
+
+    function verificarValorSepa(){
+        valor = document.getElementById("selSepa").value;
+        document.getElementById("rangeSepa").disabled = false
+
+        if (valor == "Q") {
+            clickQuartil();
+        }else if (valor == "K") {
+            clickQuintil();
+        }else if (valor == "D") {
+            clickDecil();
+        }else if (valor == "P") {
+            clickPorcentil();
+        }else if (valor == "nulo") {
+            document.getElementById("rangeSepa").disabled = true;
+            document.getElementById("rangeSepa").value = 0;
+            document.getElementById('labelRange').innerHTML = "Q0";
+        }
     }
 
     function clickQuartil(){
@@ -120,7 +182,16 @@
         label.innerHTML = sel.value + ((num * range.value)/100);
     }
 
-
+    function verificarValorDist(){
+        valor = document.getElementById("selTipoDist").value;
+        if (valor == "DN") {
+            clickNormal();
+        }else if (valor == "DU") {
+            clickUniforme();
+        }else if (valor == "DB") {
+            clickBinomial();
+        }
+    }
 
     function clickNormal(){
         document.getElementById("dBinomial").style.display = "none";
@@ -193,13 +264,18 @@
                         <div class="form-group">
                             <label class="control-label" for="txtDados"><strong>Dados</strong></label>
                             <textarea type="text" class="form-control" name="txtDados" id="txtDados" placeholder="Use ponto e vírgula para separar os dados."></textarea>
-                            <input type="file" class="form-control-file border" accept=".csv , .txt">
+                            <label class="btn btn-primary btn-dark" for="fileDesc">
+                                <input type="file" class="form-control-file border" onchange="lerArq()" id="fileDesc" accept=".csv , .txt" style= "display: none;">
+                                Upload arquivo
+                            </label>
+                            <label id="labelArqD"></label>
                         </div>
 
                         <div class="form-group">
                             <label for="selTipoPesq"><strong>Tipo de Pesquisa</strong></label>
                             <select class="form-control" id="selTipoPesq">
-                                <option value="POP" selected="selected">População</option>
+                                <option value="nulo" id="nullTipoPesq">Selecione o tipo de pesquisa.</option>
+                                <option value="POP" >População</option>
                                 <option value="AMS">Amostra</option>
                             </select>
                         </div>
@@ -215,11 +291,12 @@
 
                         <div class="form-group">
                             <label for="selTipoVar"><strong>Tipo de Variável</strong></label>
-                            <select class="form-control" id="selTipoVar">
-                                <option value="DSC" onclick="desabilitarOrdem()" selected="selected">Quantitativa Discreta</option>
-                                <option value="CNT" onclick="desabilitarOrdem()">Quantitativa Contínua</option>
-                                <option value="ORD" onclick="habilitarOrdem()">Qualitativa Ordinal</option>
-                                <option value="NML" onclick="desabilitarOrdem()">Qualitativa Nominal</option>
+                            <select class="form-control" id="selTipoVar" onchange="verificarValorTipoVar()">
+                                <option value="nulo" id="nullTipoVar">Selecione o tipo da variável pesquisada.</option>
+                                <option value="DSC">Quantitativa Discreta</option>
+                                <option value="CNT">Quantitativa Contínua</option>
+                                <option value="ORD">Qualitativa Ordinal</option>
+                                <option value="NML">Qualitativa Nominal</option>
                             </select>
                         </div>
 
@@ -231,15 +308,16 @@
                         <div class="form-group">
                             <label class="control-label"><strong>Medidas Separatrizes:</strong></label>
                             <label for="rangeSepa" class="control-label" id="labelRange">Q0</label>
-                            <select class="form-control" id="selSepa">
-                                <option value="Q" onclick="clickQuartil()" selected="selected">Quartil</option>
-                                <option value="K" onclick="clickQuintil()">Quintil</option>
-                                <option value="D" onclick="clickDecil()">Decil</option>
-                                <option value="P" onclick="clickPorcentil()">Porcentil</option>
+                            <select class="form-control" id="selSepa" onchange="verificarValorSepa()">
+                                <option value="nulo" id="nullSepa">Selecione o tipo de Medida Separatriz</option>
+                                <option value="Q">Quartil</option>
+                                <option value="K">Quintil</option>
+                                <option value="D">Decil</option>
+                                <option value="P">Porcentil</option>
                             </select>
                         </div>
 
-                        <input type="range" class="form-control-range" min="0" max="100" step="25" value="0" id="rangeSepa" onchange="changeSlider()">
+                        <input type="range" class="form-control-range" min="0" max="100" step="25" value="0" id="rangeSepa" onchange="changeSlider()" disabled>
                         <div style= "margin-top: 20px;">
                             <button type="button" class="btn btn-dark btn-block" name="btnMain" id="btnMain" onclick="calcularDescritivas()">Calcular</button>
                         </div>
@@ -344,10 +422,11 @@
                         <label id="labelTipoDist" class="control-label"></label>
                         <div class="form-group" id="dSelDist">
                             <label class="control-label">Tipo de Distribuição</label>
-                            <select class="form-control" id="selTipoDist">
-                                <option value="DN" onclick="clickNormal()">Distribuição Normal</option>
-                                <option value="DU" onclick="clickUniforme()">Distribuição Uniforme</option>
-                                <option value="DB" onclick="clickBinomial()">Distribuição Binomial</option>
+                            <select class="form-control" id="selTipoDist" onchange="verificarValorDist()">
+                                <option value="nulo" id="nullDist">Selecione o tipo de distribuição</option>
+                                <option value="DN">Distribuição Normal</option>
+                                <option value="DU">Distribuição Uniforme</option>
+                                <option value="DB">Distribuição Binomial</option>
                             </select>
                         </div>
 
@@ -438,6 +517,11 @@
                                 <label class="control-label" for="txtY">Y</label>
                                 <input type="text" class="form-control" name="txtY" id="txtY" placeholder="Use ponto e vírgula para separar os dados.">
                             </div>
+                            <label class="btn btn-primary btn-dark" for="fileCorr">
+                                <input type="file" class="form-control-file border" onchange="lerArqCorr()" id="fileCorr" accept=".csv , .txt" style= "display: none;">
+                                Upload arquivo
+                            </label>
+                            <label id="labelArqC"></label>
                         </form>
                     </div>
 
