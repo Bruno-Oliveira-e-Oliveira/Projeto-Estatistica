@@ -9,6 +9,7 @@
     <script type="text/javascript" src="javascript/probabilidades.js" ></script>
     <script type="text/javascript" src="javascript/correlacao_regressao.js" ></script>
     <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/sticky-footer.css" rel="stylesheet">
     <script type="text/javascript">
     //Descritivas
     var dados;
@@ -30,6 +31,10 @@
     var menorRegr;
     var a;
     var b;
+
+    function clickMenu(){
+        document.location.reload(true);
+    }
 
     function lerArq(){
         var arq = document.getElementById("fileDesc").files[0];
@@ -72,6 +77,8 @@
         document.getElementById("nullTipoPesq").selected = true;
         document.getElementById("nullTipoVar").selected = true;
         document.getElementById("nullSepa").selected = true;
+        document.getElementById("rangeSepa").value = 0;
+        document.getElementById("txtOrdem").disabled = true;
         scrollTop();
     }
 
@@ -93,6 +100,8 @@
         if (valor == "ORD" || valor == "NML") {
             if (valor == "ORD") {
                 habilitarOrdem();
+            }else {
+                desabilitarOrdem();
             }
             document.getElementById("selSepa").disabled = true;
             document.getElementById("rangeSepa").disabled = true;
@@ -110,6 +119,7 @@
 
     function desabilitarOrdem() {
         document.getElementById("txtOrdem").disabled = true;
+        document.getElementById("txtOrdem").value = "";
     }
 
     function verificarValorSepa(){
@@ -225,34 +235,20 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">Nome do Sistema</a>
+        <a class="navbar-brand" href="index.html">Nome do Sistema</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample03" aria-controls="navbarsExample03" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-
-        <div class="collapse navbar-collapse" id="navbarsExample03">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Página Inicial <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Sobre</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Contato</a>
-                </li>
-            </ul>
-        </div>
     </nav>
 
-    <div class="container" style= "margin-top: 30px" >
+    <div class="container" style= "margin-top: 30px; margin-bottom: 30px" >
         <div class="row">
             <div class="col-sm-2"></div>
             <div class="col-sm-8" >
                 <div id="inicial" >
                     <h1>Seja Bem Vindo Ao Sistema de Análise Estatística</h1>
                     <h4>Escolha uma das opções abaixo:</h4>
-                    <div style= "margin-top: 80px">
+                    <div style= "margin-top: 40px">
                         <button type="button" class="btn btn-dark btn-block" onclick="clickDescritivas()">Descritivas</button>
                         <button type="button" class="btn btn-dark btn-block" onclick="clickProbabilidades()">Probabilidades</button>
                         <button type="button" class="btn btn-dark btn-block" onclick="clickModelagem()" >Correlação e Regressão</button>
@@ -320,6 +316,7 @@
                         <input type="range" class="form-control-range" min="0" max="100" step="25" value="0" id="rangeSepa" onchange="changeSlider()" disabled>
                         <div style= "margin-top: 20px;">
                             <button type="button" class="btn btn-dark btn-block" name="btnMain" id="btnMain" onclick="calcularDescritivas()">Calcular</button>
+                            <button type="button" class="btn btn-dark btn-block"  id="btnMenu" onclick="clickMenu()">Retornar a página inicial</button>
                         </div>
 
                     </form>
@@ -415,6 +412,7 @@
                         </div>
                         <div id="medSep"></div>
                     </div>
+                    <button type="button" class="btn btn-dark btn-block"  id="btnMenu" onclick="clickMenu()">Retornar a página inicial</button>
                 </div>
 
                 <div id="dDist" style= "display: none;" >
@@ -503,6 +501,7 @@
                             <span class="d-block" id="CoefDU"></span>
                         </div>
                         <button type="button" class="btn btn-dark btn-block" id="btncalcDist" onclick="validacaoDist()">Calcular</button>
+                        <button type="button" class="btn btn-dark btn-block"  id="btnMenu" onclick="clickMenu()">Retornar a página inicial</button>
                     </form>
                 </div>
 
@@ -541,6 +540,7 @@
                     </div>
                     <button type="button" class="btn btn-dark btn-block"  id="btnCorrReg" onclick="validacaoCorrRegr()">Calcular</button>
                     <button type="button" class="btn btn-dark btn-block"  id="btnInserirDados" onclick="inserirDados()">Inserir Dados no Grafico</button>
+                    <button type="button" class="btn btn-dark btn-block"  id="btnMenu" onclick="clickMenu()">Retornar a página inicial</button>
                 </div>
 
 
@@ -548,6 +548,12 @@
             <div class="col-sm-2"></div>
         </div>
     </div>
+
+    <footer class="footer bg-dark">
+        <div class="container">
+            <span class="text-muted">Desenvolvido em 2018.</span>
+        </div>
+    </footer>
 
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>

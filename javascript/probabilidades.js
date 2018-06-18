@@ -22,20 +22,34 @@ function validacaoDist(){
             alert("Preencha todos os campos!!");
             return 0;
         }
-        var n = Number(formulario.txtN.value);
+        var n = formulario.txtN.value;
         var k = formulario.txtK.value;
         var p = formulario.txtP.value;
         var q = formulario.txtQ.value;
         k = k.split(";");
+
         if (k.length >= 1) {
             for (var i = 0; i < k.length; i++) {
-                k[i] = Number(k[i]);
+                k[i] = Number(k[i].replace(",","."));
+                if (isNaN(k[i])) {
+                    alert("Dados inconsistentes!");
+                    return 0;
+                }
             }
         }else {
-            k = [Number(k)];
+            k = [Number(k.replace(",","."))];
+            if (isNaN(k)) {
+                alert("Dados inconsistentes!");
+                return 0;
+            }
         }
+        n = Number(n.replace(",","."));
         p = Number(p.replace(",","."));
         q = Number(q.replace(",","."));
+        if (isNaN(Number(n)) || isNaN(Number(p)) || isNaN(Number(q)) ) {
+            alert("Dados inconsistentes!");
+            return 0;
+        }
 
         respostaDist = distBinomial(tipoDist,n,k,p,q);
         document.getElementById("probResp").innerHTML = respostaDist+"%";
@@ -58,32 +72,54 @@ function validacaoDist(){
 
         var numIntervalo = formulario.txtNIntervalo.value;
         var opU = formulario.selOPUniforme.value;
-        var pMin = Number(formulario.txtPMin.value);
-        var pMax = Number(formulario.txtPMax.value);
+        var pMin = formulario.txtPMin.value;
+        var pMax = formulario.txtPMax.value;
+        pMin = Number(pMin.replace(",","."));
+        pMax = Number(pMax.replace(",","."));
         numIntervalo = numIntervalo.split(";");
+
+        if (isNaN(Number(pMin)) || isNaN(Number(pMax))) {
+            alert("Dados inconsistentes!");
+            return 0;
+        }
+
         if (numIntervalo.length >= 1) {
             for (var i = 0; i < numIntervalo.length; i++) {
-                numIntervalo[i] = Number(numIntervalo[i]);
+                numIntervalo[i] = Number(numIntervalo[i].replace(",","."));
+                if (isNaN(numIntervalo[i])) {
+                    alert("Dados inconsistentes!");
+                    return 0;
+                }
             }
+            numIntervalo = numIntervalo.sort();
         }else {
-            numIntervalo = [Number(numIntervalo)];
+            numIntervalo = [Number(numIntervalo.replace(",","."))];
+            if (isNaN(numIntervalo)) {
+                alert("Dados inconsistentes!");
+                return 0;
+            }
         }
+
+        if ((opU == "entre" || opU == "deAte") && (numIntervalo.length != 2)) {
+            alert("Insira dois números no campo de dados!");
+            return 0;
+        }
+        if ((opU == "maiorQ" || opU == "menorQ") && (numIntervalo.length > 1)) {
+            alert("Insira um número no campo de dados!");
+            return 0;
+        }
+
 
         respostaDist = distUniforme(tipoDist,numIntervalo,opU,[pMin,pMax]);
 
-        var labelMedia = document.createElement("label");
-        var labelDesvio = document.createElement("label");
-        var labelCoef = document.createElement("label");
-        labelMedia.class = "control-label";
-        labelDesvio.class = "control-label";
-        labelCoef.class = "control-label";
+        var labelMedia = document.getElementById("mediaDU");
+        var labelDesvio = document.getElementById("desvioDU");
+        var labelCoef = document.getElementById("CoefDU");
+
         document.getElementById("probResp").innerHTML = respostaDist[0] +"%";
         labelMedia.innerHTML = "<strong>Média:</strong> "+respostaDist[1];
         labelDesvio.innerHTML = "<strong>Desvio Padrão:</strong> "+respostaDist[2];
-        labelCoef.innerHTML = "<strong>Coeficiente de Variação:</strong> "+respostaDist[3];
-        document.getElementById("mediaDU").appendChild(labelMedia);
-        document.getElementById("desvioDU").appendChild(labelDesvio);
-        document.getElementById("CoefDU").appendChild(labelCoef);
+        labelCoef.innerHTML = "<strong>Coeficiente de Variação:</strong> "+respostaDist[3]+"%";
 
     }else if (tipoDist == "DN") {
         if (formulario.txtNTrans.value == "") {
@@ -102,16 +138,42 @@ function validacaoDist(){
         }
 
         var nTrans = formulario.txtNTrans.value;
-        var mediaDN = Number(formulario.txtMediaDN.value);
-        var desvioDN = Number(formulario.txtDesvioDN.value);
+        var mediaDN = formulario.txtMediaDN.value;
+        var desvioDN = formulario.txtDesvioDN.value;
         var op = formulario.selOPNormal.value;
+        mediaDN = Number(mediaDN.replace(",","."));
+        desvioDN = Number(desvioDN.replace(",","."));
         nTrans = nTrans.split(";");
+
+        if (isNaN(Number(mediaDN)) || isNaN(Number(desvioDN))) {
+            alert("Dados inconsistentes!");
+            return 0;
+        }
+
         if (nTrans.length >= 1) {
             for (var i = 0; i < nTrans.length; i++) {
-                nTrans[i] = Number(nTrans[i]);
+                nTrans[i] = Number(nTrans[i].replace(",","."));
+                if (isNaN(nTrans[i])) {
+                    alert("Dados inconsistentes!");
+                    return 0;
+                }
             }
+            nTrans = nTrans.sort();
         }else {
-            nTrans = [Number(nTrans)];
+            nTrans = [Number(nTrans[0].replace(",","."))];
+            if (isNaN(nTrans)) {
+                alert("Dados inconsistentes!");
+                return 0;
+            }
+        }
+
+        if ((op == "entre" ) && (nTrans.length > 2)) {
+            alert("Insira dois números no campo de dados!");
+            return 0;
+        }
+        if ((op == "maiorQ" || op == "menorQ") && (nTrans.length > 1)) {
+            alert("Insira um número no campo de dados!");
+            return 0;
         }
 
         respostaDist = distNormal(tipoDist,nTrans,op,mediaDN,desvioDN);

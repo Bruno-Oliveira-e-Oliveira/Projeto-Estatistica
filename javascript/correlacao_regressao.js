@@ -16,14 +16,9 @@ function validacaoCorrRegr() {
     }
 
     for (var i = 0; i < xHist.length; i++) {
-        xHist[i] = Number(xHist[i]);
-        yHist[i] = Number(yHist[i]);
+        xHist[i] = Number(xHist[i].replace(",","."));
+        yHist[i] = Number(yHist[i].replace(",","."));
     }
-
-
-    //xHist = [33,25,24,18,12,10,8,4];
-    //yHist = [300,400,500,600,700,800,900,1000];
-
 
     calcCorr_Regr();
 
@@ -69,6 +64,12 @@ function calcCorr_Regr(){
     coefLinear = (nAmostras * somaXY - (somaX) * somaY) / (Math.sqrt((nAmostras * somaPx - (somaX ** 2)) * (nAmostras * somaPy - (somaY **2))));
     coefLinear = parseFloat(coefLinear.toFixed(2));
 
+    if (isNaN(coefLinear)) {
+        document.getElementById("labelCoefL").innerHTML = "Não foi possível calcular o Coeficiente Linear. Divisão de 0 sobre 0";
+    }else {
+        document.getElementById("labelCoefL").innerHTML = coefLinear;
+    }
+
     //Regressão
     a = (nAmostras * somaXY - somaX * somaY) / (nAmostras * somaPx - (somaX ** 2));
     a = parseFloat(a.toFixed(2));
@@ -79,7 +80,7 @@ function calcCorr_Regr(){
     eqReta = "Y = "+a+"X + "+b;
     gerarGraficoReg();
 
-    document.getElementById("labelCoefL").innerHTML = coefLinear;
+
     document.getElementById("labelEqReta").innerHTML = eqReta;
     document.getElementById("saidaCorrRegr").style = "display: block;";
 }
@@ -119,18 +120,6 @@ function gerarGraficoReg(){
             line: {
                 tension: 0
             }
-        },
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero:true
-                }
-            }],
-            xAxes: [{
-                ticks: {
-                    beginAtZero:true
-                }
-            }]
         }
     }
 

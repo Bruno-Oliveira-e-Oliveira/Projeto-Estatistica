@@ -5,7 +5,7 @@ function calcularDescritivas(){
 
     if (valido) {
         dados = form.txtDados.value;
-        dados = dados.split(";")
+        dados = dados.split(";");
         tipoVar = form.selTipoVar.value;
         tipoPesq = form.selTipoPesq.value;
         nomeVar = form.txtNomeVar.value;
@@ -14,20 +14,31 @@ function calcularDescritivas(){
         ordem = ordem.split(";");
         tipoSeparatriz = form.selSepa.value;
         valorSeparatriz = form.rangeSepa.value;
-        console.log(valorSeparatriz);
-    } else {
+    } else{
         alert("Preencha todos os campos!");
         return 0;
     }
 
     if (tipoVar == "ORD") {
         var posicao = ordem.length-1;
+        if ( (!(isNaN(Number(dados[0])))) || (!(isNaN(Number(ordem[0])))) ) {
+            alert("Dados inconsistentes!");
+            return 0;
+        }
         dados = ordenarQltOrd(dados,ordem,posicao);
     }else if (tipoVar == "NML") {
+        if (!(isNaN(Number(dados[0])))) {
+            alert("Dados inconsistentes!");
+            return 0;
+        }
         dados = dados.sort();
     } else if(tipoVar == "DSC" || tipoVar == "CNT"){
         for (var i = 0; i < dados.length; i++) {
-            dados[i] = Number(dados[i]);
+            dados[i] = Number(dados[i].replace(",","."));
+            if (isNaN(Number(dados[i])) ) {
+                alert("Dados inconsistentes!");
+                return 0;
+            }
         }
         dados = dados.sort(ordenarQtt);
     }
@@ -70,21 +81,26 @@ function calcularDescritivas(){
 function validacaoDesc(form) {
     if (form.txtDados.value == "") {
         return false;
-    } else if (form.txtNomeVar.value == "") {
+    }
+    if (form.txtNomeVar.value == "") {
         return false;
-    } else if (form.txtNomeFi.value == "") {
+    }
+    if (form.txtNomeFi.value == "") {
         return false;
-    } else if (form.selTipoVar.value == "ORD") {
+    }
+    if (form.selTipoVar.value == "ORD") {
         if (form.txtOrdem.value == "") {
             return false;
         }
-    }else if (form.selTipoVar.value == "nulo") {
-        return false;
-    }else if (form.selTipoPesq.value == "nulo") {
-        return false;
-    }else {
-        return true;
     }
+    if (form.selTipoVar.value == "nulo") {
+        return false;
+    }
+    if (form.selTipoPesq.value == "nulo") {
+        return false;
+    }
+
+    return true;
 }
 
 //Funcao que ordena dados Quantitativos
@@ -524,7 +540,7 @@ function gerarGrafico(matriz){
                 {
                     label: nomeFi,
                     data: data,
-                    backgroundColor: ["#ff2200","#00008B","#228B22","#4169E1","#ADFF2F","#DAA520","#A0522D","#4B0082","#7B68EE","#DC143C","#FF8C00","#F08080","#8A2BE2"],
+                    backgroundColor: ["#ff2200","#00008B","#228B22","#4169E1","#ADFF2F","#DAA520","#A0522D","#4B0082","#7B68EE","#DC143C","#FF8C00","#F08080","#8A2BE2","#ff2200","#00008B","#228B22","#4169E1","#ADFF2F","#DAA520","#A0522D","#4B0082","#7B68EE","#DC143C","#FF8C00"],
                     borderWidth: 0
                 }
             ]
@@ -541,7 +557,7 @@ function medSeparatrizes(matriz){
     var resposta;
 
     if (tipoVar == "DSC") {
-        var somaFi = matriz[3][matriz.length-1];
+        var somaFi = matriz[3][matriz[0].length-1];
         pos = Math.round((somaFi * (valorSeparatriz/100)));
 
         for (var i = 0; i < matriz[0].length; i++) {
@@ -550,15 +566,20 @@ function medSeparatrizes(matriz){
             }
         }
     }else if (tipoVar == "CNT") {
-        var somaFi = matriz[5][matriz.length-1];
+        var somaFi = matriz[5][matriz[0].length-1];
         var intervalo = matriz[2][0] - matriz[1][0];
         var classe;
         var facAnt;
         pos = (somaFi * (valorSeparatriz/100));
+        console.log(matriz[5]+" matriz 5");
+        console.log(somaFi+" somafi");
+        console.log(valorSeparatriz+" valor sepa");
+        console.log(pos+" pos");
 
         for (var i = 0; i < matriz[0].length; i++) {
             if (matriz[5][i] >= pos && classe == null) {
                 classe = i;
+                console.log(matriz[5][i]+" classe");
             }
         }
 
@@ -567,10 +588,14 @@ function medSeparatrizes(matriz){
         }else {
             facAnt = matriz[5][classe-1];
         }
+        console.log(facAnt+" fac");
+        console.log(matriz[3][classe]+ " matriz 3 classe");
 
         num = matriz[1][classe] + (((pos - facAnt)/matriz[3][classe]) * intervalo);
         num = parseFloat((num).toFixed(2));
+        console.log(num+" num");
     }
     resposta = valorSeparatriz+"%: "+num+" ou - <br>"+(100 - valorSeparatriz)+"%: "+num+" ou +";
+    console.log(resposta+" resp");
     return resposta;
 }
