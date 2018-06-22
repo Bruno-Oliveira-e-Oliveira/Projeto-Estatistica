@@ -52,6 +52,7 @@ function calcCorr_Regr(){
     var eqReta;
     var regY;
     var regX;
+    var sinal;
 
     for (var i = 0; i < matrizHist[0].length; i++) {
         xY.push(matrizHist[0][i] * matrizHist[1][i]);
@@ -77,7 +78,14 @@ function calcCorr_Regr(){
     regX = somaX / nAmostras;
     b = regY - a * regX;
     b = parseFloat(b.toFixed(2));
-    eqReta = "Y = "+a+"X + "+b;
+
+    if (b >= 0) {
+        sinal = "+";
+    }else {
+        sinal = "";
+    }
+
+    eqReta = "Y = "+a+"X "+sinal+" "+b;
     gerarGraficoReg();
 
 

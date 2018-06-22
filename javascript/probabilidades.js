@@ -46,8 +46,14 @@ function validacaoDist(){
         n = Number(n.replace(",","."));
         p = Number(p.replace(",","."));
         q = Number(q.replace(",","."));
+
         if (isNaN(Number(n)) || isNaN(Number(p)) || isNaN(Number(q)) ) {
             alert("Dados inconsistentes!");
+            return 0;
+        }
+
+        if ((p+q) != 1) {
+            alert("A soma dos valores dos campos P e Q devem ser igual a 1!");
             return 0;
         }
 

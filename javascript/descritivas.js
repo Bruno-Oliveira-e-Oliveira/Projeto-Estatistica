@@ -41,6 +41,7 @@ function calcularDescritivas(){
             }
         }
         dados = dados.sort(ordenarQtt);
+
     }
     matriz = calcularFreq();
     gerarTabela(matriz);
@@ -69,7 +70,13 @@ function calcularDescritivas(){
 
         for (var i = 0; i < medEst.length; i++) {
             var label = document.getElementById("label"+texto+(i+1));
-            label.innerHTML = medEst[i];
+
+            if ((i == 7 && tipoVar == "CNT") || (i == 4 && tipoVar == "DSC")) {
+                label.innerHTML = medEst[i] +"%";
+            } else {
+                label.innerHTML = medEst[i];
+            }
+
         }
 
     }
@@ -132,7 +139,7 @@ function calcularVarContinua(){
     var fi = [];
 
     //1° Passo: Amplitude
-    var amp = dados[dados.length-1] - dados[0];
+    var amp = Math.round(dados[dados.length-1] - dados[0]);
 
     //2° Passo: Classes
     var classes = [];
@@ -145,7 +152,12 @@ function calcularVarContinua(){
     var classe;
 
     do {
-        amp++;
+
+        if (amp % 1 != 0) {
+            amp = Math.ceil(amp);
+        }else {
+            amp++;
+        }
 
         for (var i = 0; i < classes.length; i++) {
             if (amp % classes[i] == 0 && classe == null) {
@@ -449,6 +461,13 @@ function medidasEst(matriz){
 
             }
             modaPearson = parseFloat((3 * mediana - 2 * media).toFixed(2));
+
+            for (var i = 0; i < modaKing.length; i++) {
+                if (isNaN(modaKing[i])) {
+                    modaKing = "Não há como calcular a moda de King. (Divisão de 0 sobre 0)";
+                    break;
+                }
+            }
         }else {
             modaPearson = "Amodal";
             modaKing = "Amodal";
@@ -532,6 +551,8 @@ function gerarGrafico(matriz){
         data = matriz[1];
     }
 
+    var cores = ["#ff2200","#00008B","#228B22","#4169E1","#ADFF2F","#DAA520","#A0522D","#4B0082","#7B68EE","#DC143C","#FF8C00","#F08080","#8A2BE2","#ff2200","#00008B","#228B22","#4169E1","#ADFF2F","#DAA520","#A0522D","#4B0082","#7B68EE","#DC143C"];
+
     var chart = new Chart(graf, {
         type: tipoGraf,
         data: {
@@ -540,7 +561,7 @@ function gerarGrafico(matriz){
                 {
                     label: nomeFi,
                     data: data,
-                    backgroundColor: ["#ff2200","#00008B","#228B22","#4169E1","#ADFF2F","#DAA520","#A0522D","#4B0082","#7B68EE","#DC143C","#FF8C00","#F08080","#8A2BE2","#ff2200","#00008B","#228B22","#4169E1","#ADFF2F","#DAA520","#A0522D","#4B0082","#7B68EE","#DC143C","#FF8C00"],
+                    backgroundColor: cores,
                     borderWidth: 0
                 }
             ]
@@ -571,15 +592,10 @@ function medSeparatrizes(matriz){
         var classe;
         var facAnt;
         pos = (somaFi * (valorSeparatriz/100));
-        console.log(matriz[5]+" matriz 5");
-        console.log(somaFi+" somafi");
-        console.log(valorSeparatriz+" valor sepa");
-        console.log(pos+" pos");
 
         for (var i = 0; i < matriz[0].length; i++) {
             if (matriz[5][i] >= pos && classe == null) {
                 classe = i;
-                console.log(matriz[5][i]+" classe");
             }
         }
 
@@ -588,14 +604,10 @@ function medSeparatrizes(matriz){
         }else {
             facAnt = matriz[5][classe-1];
         }
-        console.log(facAnt+" fac");
-        console.log(matriz[3][classe]+ " matriz 3 classe");
 
         num = matriz[1][classe] + (((pos - facAnt)/matriz[3][classe]) * intervalo);
         num = parseFloat((num).toFixed(2));
-        console.log(num+" num");
     }
     resposta = valorSeparatriz+"%: "+num+" ou - <br>"+(100 - valorSeparatriz)+"%: "+num+" ou +";
-    console.log(resposta+" resp");
     return resposta;
 }
